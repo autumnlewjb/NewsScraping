@@ -125,12 +125,16 @@ class Scrape_News:
     def main(self):
         href = self.get_pagelink()
         for link in href:
-            text_only = self.get_text(link)
-            directory = self.generate_dir(text_only)
             try:
+                text_only = self.get_text(link)
+                print(text_only)
+                directory = self.generate_dir(text_only)
+
                 self.write_file(text_only, directory)
-            except UnicodeEncodeError as ue:
+            except (UnicodeEncodeError, TypeError) as ue:
                 print(ue)
+            except:
+                continue
 
         self.browser.quit()
 
