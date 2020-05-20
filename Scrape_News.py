@@ -77,6 +77,7 @@ class Scrape_News:
         day = int(date.day)
 
         self.date = '%02d.%02d.%04d' % (day, month, year)
+        # self.date = '20.05.2020'
 
     def create_file(self, dir):
         exist = os.path.exists(dir)
@@ -97,7 +98,7 @@ class Scrape_News:
     def generate_dir(self, text_only):
         title = self.validate_title(text_only[0])
         news_content = text_only[1:]
-        dir = 'C:\\Users\\autum\\Documents\\News\\'
+        dir = 'C:\\Users\\Autumn\\Documents\\News\\'
         self.create_file(dir)
         dir = dir + str(self.date)
         self.create_file(dir)
