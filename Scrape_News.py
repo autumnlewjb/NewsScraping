@@ -6,6 +6,7 @@ from datetime import datetime
 from Month import month_in_words
 from Url_List import news_link
 
+
 class Scrape_News:
     def __init__(self, url):
         self.browser = webdriver.Chrome()
