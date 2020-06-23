@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 
 from selenium import webdriver
 from bs4 import BeautifulSoup as bs
@@ -9,11 +10,53 @@ from month import month_in_words
 from url_list import news_link
 
 
+def create_file(directory):
+    directory = str(directory)
+    exist = os.path.exists(directory)
+    if not exist:
+        os.mkdir(directory)
+
+
+def validate_title(title):
+    invalid_symbols = re.compile(r'[\\/:*?"<>|]')
+
+    return invalid_symbols.sub('', title)
+
+
+def write_file(text_only, directory):
+    title = text_only['title']
+    news_content = text_only['content']
+    file = open(directory, 'w+')
+    file.write(title)
+    file.write('\n' * 2)
+    for text in news_content:
+        file.write(text)
+        print(text)
+        file.write('\n')
+
+    if not file.closed:
+        file.close()
+
+
 class ScrapeNews:
     def __init__(self, url):
         self.browser = webdriver.Chrome()
         self.url = url
-        self.date = None
+        self.date = datetime.now()
+        self.main_directory = Path().home() / 'Documents' / 'News'
+
+    @property
+    def date(self):
+        return self._date
+
+    @date.setter
+    def date(self, date):
+        year = int(date.year)
+        month = int(date.month)
+        day = int(date.day)
+
+        self._date = '%02d.%02d.%04d' % (day, month, year)
+        # self.date = '20.05.2020'
 
     def get_page_link(self):
         main_page = "{}?page={}"
@@ -47,7 +90,6 @@ class ScrapeNews:
         return true_href
 
     def get_text(self, href):
-        self.get_current_date()
         self.browser.get(str(href))
         source = self.browser.page_source
         soup = bs(source, 'lxml')
@@ -67,69 +109,34 @@ class ScrapeNews:
             title = soup.find('h1', class_='page-title mb-2')
             content_div = soup.find('div', class_='field field-body')
             page_content = content_div.find_all('p')
-            text_only = [title.text]
-
-            for paragraph in page_content:
-                text_only.append(paragraph.text.strip())
+            page_content = [paragraph.text.strip() for paragraph in page_content]
+            text_only = dict(title=title.text, content=page_content)
 
             return text_only
 
-    def get_current_date(self):
-        date = datetime.now()
-        year = int(date.year)
-        month = int(date.month)
-        day = int(date.day)
+    def generate_dir(self, title):
+        if title:
+            title = validate_title(title)
+            create_file(self.main_directory)
+            directory = self.main_directory / str(self.date)
+            create_file(directory)
+            category = str(self.url.split('/')[-1])
+            directory = directory / category
+            create_file(directory)
+            directory = directory / (str(title) + '.txt')
 
-        self.date = '%02d.%02d.%04d' % (day, month, year)
-        # self.date = '20.05.2020'
-
-    def create_file(self, directory):
-        exist = os.path.exists(directory)
-        if not exist:
-            os.mkdir(directory)
-
-    def validate_title(self, title):
-        invalid_symbols = re.compile(r'[\\/:*?"<>|]')
-
-        return invalid_symbols.sub('', title)
-
-    def generate_dir(self, text_only):
-        title = self.validate_title(text_only[0])
-        news_content = text_only[1:]
-        dir = 'C:\\Users\\Autumn\\Documents\\News\\'
-        self.create_file(dir)
-        dir = dir + str(self.date)
-        self.create_file(dir)
-        category = str(self.url.split('/')[-1])
-        dir = dir + '\\' + category
-        self.create_file(dir)
-        dir = dir + '\\' + str(title) + '.txt'
-
-        return dir
-
-    def write_file(self, text_only, directory):
-        title = text_only[0]
-        news_content = text_only[1:]
-        file = open(directory, 'w+')
-        file.write(title)
-        file.write('\n' * 2)
-        for text in news_content:
-            file.write(text)
-            print(text)
-            file.write('\n')
-
-        if not file.closed:
-            file.close()
+            return str(directory)
 
     def main(self):
         href = self.get_page_link()
         for link in href:
             try:
                 text_only = self.get_text(link)
-                print(text_only)
-                directory = self.generate_dir(text_only)
+                print(text_only['title'])
+                print(text_only['content'])
+                directory = self.generate_dir(text_only['title'])
 
-                self.write_file(text_only, directory)
+                write_file(text_only, directory)
             except (UnicodeEncodeError, TypeError) as ue:
                 print(ue)
             except:
