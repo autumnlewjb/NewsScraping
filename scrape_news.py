@@ -1,18 +1,21 @@
+import re
+
 from selenium import webdriver
 from bs4 import BeautifulSoup as bs
 from time import sleep
 import os
 from datetime import datetime
-from Month import month_in_words
-from Url_List import news_link
+from month import month_in_words
+from url_list import news_link
 
 
-class Scrape_News:
+class ScrapeNews:
     def __init__(self, url):
         self.browser = webdriver.Chrome()
         self.url = url
+        self.date = None
 
-    def get_pagelink(self):
+    def get_page_link(self):
         main_page = "{}?page={}"
         page = 0
         true_href = []
@@ -80,21 +83,15 @@ class Scrape_News:
         self.date = '%02d.%02d.%04d' % (day, month, year)
         # self.date = '20.05.2020'
 
-    def create_file(self, dir):
-        exist = os.path.exists(dir)
+    def create_file(self, directory):
+        exist = os.path.exists(directory)
         if not exist:
-            os.mkdir(dir)
+            os.mkdir(directory)
 
     def validate_title(self, title):
-        invalid = '\\ / : * ? " < > |'.split(' ')
-        i = 0
-        break_text = list(title)
-        while i < len(break_text):
-            if break_text[i] in invalid:
-                break_text[i] = ''
-            i += 1
+        invalid_symbols = re.compile(r'[\\/:*?"<>|]')
 
-        return ''.join(break_text)
+        return invalid_symbols.sub('', title)
 
     def generate_dir(self, text_only):
         title = self.validate_title(text_only[0])
@@ -110,10 +107,10 @@ class Scrape_News:
 
         return dir
 
-    def write_file(self, text_only, dir):
+    def write_file(self, text_only, directory):
         title = text_only[0]
         news_content = text_only[1:]
-        file = open(dir, 'w+')
+        file = open(directory, 'w+')
         file.write(title)
         file.write('\n' * 2)
         for text in news_content:
@@ -125,7 +122,7 @@ class Scrape_News:
             file.close()
 
     def main(self):
-        href = self.get_pagelink()
+        href = self.get_page_link()
         for link in href:
             try:
                 text_only = self.get_text(link)
@@ -141,6 +138,7 @@ class Scrape_News:
         self.browser.quit()
 
 
-for link in news_link:
-    obj = Scrape_News(link)
-    obj.main()
+if __name__ == '__main__':
+    for link in news_link:
+        obj = ScrapeNews(link)
+        obj.main()
