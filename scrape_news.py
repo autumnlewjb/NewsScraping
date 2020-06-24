@@ -153,6 +153,7 @@ class ScrapeNews:
         for link in news_link:
             self.url = link
             self.each_category()
+        self.browser.quit()
         self.notify.send_note()
 
 
