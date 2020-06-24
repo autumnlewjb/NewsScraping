@@ -8,6 +8,7 @@ import os
 from datetime import datetime
 from month import month_in_words
 from url_list import news_link
+from notification import Notification
 
 
 def create_file(directory):
@@ -39,11 +40,12 @@ def write_file(text_only, directory):
 
 
 class ScrapeNews:
-    def __init__(self, url):
+    def __init__(self):
         self.browser = webdriver.Chrome()
-        self.url = url
+        self.url = None
         self.date = datetime.now()
         self.main_directory = Path().home() / 'Documents' / 'News'
+        self.notify = Notification()
 
     @property
     def date(self):
@@ -120,6 +122,7 @@ class ScrapeNews:
             create_file(self.main_directory)
             directory = self.main_directory / str(self.date)
             create_file(directory)
+            self.notify.set_directory(directory)
             category = str(self.url.split('/')[-1])
             directory = directory / category
             create_file(directory)
@@ -127,7 +130,8 @@ class ScrapeNews:
 
             return str(directory)
 
-    def main(self):
+    def each_category(self):
+        number_of_news = 0
         href = self.get_page_link()
         for link in href:
             try:
@@ -137,15 +141,21 @@ class ScrapeNews:
                 directory = self.generate_dir(text_only['title'])
 
                 write_file(text_only, directory)
+                number_of_news += 1
             except (UnicodeEncodeError, TypeError) as ue:
                 print(ue)
             except:
                 continue
 
-        self.browser.quit()
+        self.notify.get_total_news(number_of_news)
+
+    def main(self):
+        for link in news_link:
+            self.url = link
+            self.each_category()
+        self.notify.send_note()
 
 
 if __name__ == '__main__':
-    for link in news_link:
-        obj = ScrapeNews(link)
-        obj.main()
+    obj = ScrapeNews()
+    obj.main()
