@@ -9,6 +9,7 @@ from datetime import datetime
 from month import month_in_words
 from url_list import news_link
 from notification import Notification
+from setup import register_notify
 
 
 def create_file(directory):
@@ -41,6 +42,7 @@ def write_file(text_only, directory):
 
 class ScrapeNews:
     def __init__(self):
+        register_notify()
         self.browser = webdriver.Chrome()
         self.url = None
         self.date = datetime.now()
