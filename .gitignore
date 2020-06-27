@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # others
-registered.txt/
+registered.txt
