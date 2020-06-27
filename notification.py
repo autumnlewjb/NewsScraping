@@ -1,4 +1,5 @@
 from notify_run import Notify
+from setup import register_notify
 
 
 class Notification:
@@ -19,6 +20,16 @@ class Notification:
         self._directory = str(value)
 
     def send_note(self):
+        try:
+            with open('registered.txt', 'r') as input_file:
+                status = int(input_file.read())
+                print(status)
+                if status != 1:
+                    register_notify()
+
+        except FileNotFoundError:
+            register_notify()
+        print(self._total_news, self._directory)
         if self._total_news and self._directory:
             self._generate_message()
             self.service.send(self.message)

@@ -1,7 +1,4 @@
-import io
-from PIL import ImageTk
 from notify_run import Notify
-from pyqrcode import QRCode
 
 
 def register_notify():
@@ -9,3 +6,6 @@ def register_notify():
     print('Register at {}'.format(reg.register().endpoint))
 
     input('Press Enter after registration')
+
+    with open('registered.txt', 'w+') as output_file:
+        output_file.write('1')
