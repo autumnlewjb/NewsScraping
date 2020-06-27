@@ -1,4 +1,4 @@
-# NewsScrapping
+# NewsScraping
 Scrape news from New Straits Time, a news website.
 ## Introduction
 This project started when I find reading latest news is too troublesome. With this, I could scrape latest news from trusted website and save them to my local storage.
