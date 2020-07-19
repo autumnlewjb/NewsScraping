@@ -6,9 +6,9 @@ from bs4 import BeautifulSoup as bs
 from time import sleep
 import os
 from datetime import datetime
-from month import month_in_words
-from url_list import news_link
-from notification import Notification
+from news_scraping.month import month_in_words
+from news_scraping.url_list import news_link
+from news_scraping.notification import Notification
 
 
 def create_file(directory):

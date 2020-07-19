@@ -7,5 +7,5 @@ def register_notify():
 
     input('Press Enter after registration')
 
-    with open('registered.txt', 'w+') as output_file:
+    with open('resources/registered.txt', 'w+') as output_file:
         output_file.write('1')
