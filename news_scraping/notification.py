@@ -21,7 +21,7 @@ class Notification:
 
     def send_note(self):
         try:
-            with open('registered.txt', 'r') as input_file:
+            with open('../resources/registered.txt', 'r') as input_file:
                 status = int(input_file.read())
                 print(status)
                 if status != 1:
